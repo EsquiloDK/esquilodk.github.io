@@ -75,15 +75,20 @@
     transition:opacity .6s ease, visibility .6s ease;
   }
   #loader.done{opacity:0;visibility:hidden}
-  .track{position:relative;width:min(86vw,520px);height:110px;overflow:hidden}
+  .track{position:relative;width:min(86vw,520px);height:145px;overflow:hidden}
   .track::after{
     content:"";position:absolute;left:0;right:0;bottom:6px;height:2px;
     background:linear-gradient(90deg,transparent,var(--p1),var(--cyan),var(--p1),transparent);
     box-shadow:0 0 14px var(--p1);
   }
-  .runner{
-    position:absolute;bottom:8px;left:-80px;
-    animation:runAcross 2.4s linear infinite;
+  .track::before{ /* chão passando para trás, dá a sensação de corrida */
+    content:"";position:absolute;left:0;right:0;bottom:3px;height:3px;
+    background:repeating-linear-gradient(90deg,rgba(240,171,252,.55) 0 14px,transparent 14px 34px);
+    animation:ground .35s linear infinite;
+  }
+  @keyframes ground{to{background-position:-34px 0}}
+  .runner{ /* a posição (left) é controlada pelo JS, acompanhando a barra de progresso */
+    position:absolute;bottom:8px;left:0;
   }
   .runner img{
     image-rendering:pixelated;display:block;
@@ -98,9 +103,10 @@
   .runner::before{top:46%;width:46px}
   .runner::after{top:64%;width:30px;animation-delay:.12s}
   @keyframes runAcross{from{left:-90px}to{left:calc(100% + 10px)}}
+  /* o GIF olha para a esquerda; scaleX(-1) vira ele para a direita, que é o sentido da corrida */
   @keyframes runBob{
-    0%,100%{transform:translateY(0) rotate(8deg)}
-    50%{transform:translateY(-12px) rotate(-3deg)}
+    0%,100%{transform:translateY(0) rotate(6deg) scaleX(-1)}
+    50%{transform:translateY(-12px) rotate(-2deg) scaleX(-1)}
   }
   @keyframes dust{from{opacity:1;transform:translateX(0)}to{opacity:0;transform:translateX(-26px)}}
   .loadtext{font-family:'Orbitron',sans-serif;font-weight:800;letter-spacing:.35em;font-size:.85rem;color:var(--muted)}
@@ -374,7 +380,8 @@ toLoad.forEach(src=>{
   im.src = src;
 });
 const startTime = performance.now();
-const MIN_TIME = 2200; // tempo mínimo da tela de carregamento (ms)
+const MIN_TIME = 3200; // tempo mínimo da tela de carregamento (ms)
+const runner = document.querySelector('.runner');
 const tick = setInterval(()=>{
   const real = loaded/total;
   const timeP = Math.min((performance.now()-startTime)/MIN_TIME,1);
@@ -383,6 +390,10 @@ const tick = setInterval(()=>{
   const p = Math.round(progress*100);
   fill.style.width = p+'%';
   pct.textContent = ' '+p+'%';
+  // o ninja corre da esquerda para a direita junto com a barra
+  const f = (progress*100).toFixed(1);
+  runner.style.left = f+'%';
+  runner.style.transform = 'translateX(-'+f+'%)';
   if(real>=1 && timeP>=1 && progress>0.985 && !finished){
     finished = true;
     clearInterval(tick);
@@ -408,6 +419,9 @@ const MAX_LEFT = () => -Math.min(window.innerWidth - 120, 240);
 
 function setState(s, src){
   state = s;
+  // Os GIFs olham para a esquerda (facing = 1). Só ao andar para a direita ele fica espelhado;
+  // em qualquer outra ação ele volta a olhar para a esquerda.
+  if(s !== 'walk') facing = 1;
   buddy.className = 's-'+s;
   sprite.src = src || SPRITES[s] || SPRITES.idle;
   buddy.style.setProperty('--fx', facing);
@@ -483,7 +497,7 @@ window.addEventListener('touchmove', e=>{
 buddy.addEventListener('click', ()=>{
   busy = true; clearTimeout(idleTimer);
   setState('love');
-  say('♥', 1500);
+  bubble.classList.remove('show');
   const r = buddy.getBoundingClientRect();
   for(let i=0;i<7;i++){
     const h = document.createElement('div');
