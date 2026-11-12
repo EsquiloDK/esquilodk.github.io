@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>EsquiloDK</title>
+<meta name="description" content="Links oficiais do EsquiloDK">
+<meta name="theme-color" content="#0a0614">
+<link rel="icon" href="avatar.png">
+<meta property="og:title" content="EsquiloDK">
+<meta property="og:image" content="avatar.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --bg:#0a0614;
+    --panel:#140c26;
+    --line:#2e1d52;
+    --text:#f5f0ff;
+    --muted:#a99cc9;
+    --p1:#a855f7;      /* roxo principal */
+    --p2:#7c3aed;      /* roxo escuro */
+    --pink:#f0abfc;    /* rosa anime */
+    --cyan:#67e8f9;    /* ciano neon */
+    --glow:rgba(168,85,247,.45);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    min-height:100vh;
+    background:
+      radial-gradient(900px 520px at 85% -10%, rgba(168,85,247,.28), transparent 60%),
+      radial-gradient(800px 560px at 0% 8%, rgba(103,232,249,.09), transparent 60%),
+      radial-gradient(900px 600px at 50% 120%, rgba(124,58,237,.3), transparent 60%),
+      var(--bg);
+    color:var(--text);
+    font-family:'Rajdhani',system-ui,sans-serif;
+    font-weight:600;
+    overflow-x:hidden;
+  }
+  /* scanlines */
+  body::before{
+    content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+    background:repeating-linear-gradient(0deg, rgba(255,255,255,.025) 0 1px, transparent 1px 3px);
+    mix-blend-mode:overlay;
+  }
+  /* linhas de velocidade estilo anime */
+  .speed{position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.55;
+    background:repeating-conic-gradient(from 0deg at 50% 30%, rgba(200,160,255,.05) 0deg 1.2deg, transparent 1.2deg 9deg);
+    -webkit-mask-image:radial-gradient(circle at 50% 30%, transparent 20%, #000 78%);
+            mask-image:radial-gradient(circle at 50% 30%, transparent 20%, #000 78%);
+  }
+  /* chão neon em perspectiva */
+  .grid{
+    position:fixed;left:-50%;right:-50%;bottom:0;height:46vh;z-index:0;pointer-events:none;
+    background:
+      linear-gradient(var(--p1) 1px, transparent 1px) 0 0/100% 46px,
+      linear-gradient(90deg, var(--p1) 1px, transparent 1px) 0 0/64px 100%;
+    opacity:.22;
+    transform:perspective(380px) rotateX(62deg);transform-origin:50% 100%;
+    -webkit-mask-image:linear-gradient(to top,#000 5%,transparent 85%);
+            mask-image:linear-gradient(to top,#000 5%,transparent 85%);
+    animation:gridMove 3s linear infinite;
+  }
+  @keyframes gridMove{to{background-position:0 46px,0 0}}
+  #sparks{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:0}
+
+  /* ---------- LOADING ---------- */
+  #loader{
+    position:fixed;inset:0;z-index:100;
+    background:radial-gradient(600px 400px at 50% 55%, rgba(124,58,237,.25), transparent 70%), var(--bg);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;
+    transition:opacity .6s ease, visibility .6s ease;
+  }
+  #loader.done{opacity:0;visibility:hidden}
+  .track{position:relative;width:min(86vw,520px);height:110px;overflow:hidden}
+  .track::after{
+    content:"";position:absolute;left:0;right:0;bottom:6px;height:2px;
+    background:linear-gradient(90deg,transparent,var(--p1),var(--cyan),var(--p1),transparent);
+    box-shadow:0 0 14px var(--p1);
+  }
+  .runner{
+    position:absolute;bottom:8px;left:-80px;
+    animation:runAcross 2.4s linear infinite;
+  }
+  .runner img{
+    image-rendering:pixelated;display:block;
+    animation:runBob .28s ease-in-out infinite;
+    filter:drop-shadow(0 6px 0 rgba(0,0,0,.4));
+  }
+  .runner::before,.runner::after{
+    content:"";position:absolute;right:92%;height:3px;border-radius:3px;
+    background:linear-gradient(90deg,transparent,var(--pink));
+    animation:dust .35s linear infinite;
+  }
+  .runner::before{top:46%;width:46px}
+  .runner::after{top:64%;width:30px;animation-delay:.12s}
+  @keyframes runAcross{from{left:-90px}to{left:calc(100% + 10px)}}
+  @keyframes runBob{
+    0%,100%{transform:translateY(0) rotate(8deg)}
+    50%{transform:translateY(-12px) rotate(-3deg)}
+  }
+  @keyframes dust{from{opacity:1;transform:translateX(0)}to{opacity:0;transform:translateX(-26px)}}
+  .loadtext{font-family:'Orbitron',sans-serif;font-weight:800;letter-spacing:.35em;font-size:.85rem;color:var(--muted)}
+  .loadtext b{color:var(--pink)}
+  .bar{width:min(70vw,320px);height:7px;border-radius:7px;background:#1a1030;overflow:hidden;border:1px solid var(--line)}
+  .bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--p2),var(--p1),var(--pink));
+    box-shadow:0 0 14px var(--p1);transition:width .25s ease}
+
+  /* ---------- PERFIL ---------- */
+  main{
+    position:relative;z-index:1;
+    max-width:520px;margin:0 auto;padding:56px 20px 160px;
+    display:flex;flex-direction:column;align-items:center;
+  }
+  .avatar-wrap{position:relative;width:176px;height:176px;margin-bottom:24px}
+  .avatar-wrap::before{
+    content:"";position:absolute;inset:-9px;border-radius:50%;
+    background:conic-gradient(from 0deg,var(--p1),var(--pink),var(--cyan),var(--p2),var(--p1));
+    animation:spin 5s linear infinite;
+    -webkit-mask:radial-gradient(circle,transparent 66%,#000 67%);
+            mask:radial-gradient(circle,transparent 66%,#000 67%);
+  }
+  .avatar-wrap::after{
+    content:"";position:absolute;inset:-16px;border-radius:50%;
+    box-shadow:0 0 46px var(--glow),0 0 100px rgba(124,58,237,.25);
+    animation:pulse 3s ease-in-out infinite;
+  }
+  .avatar{
+    position:relative;z-index:1;width:100%;height:100%;border-radius:50%;
+    object-fit:cover;object-position:50% 38%;
+    border:4px solid #0a0614;background:#111;
+  }
+  @keyframes spin{to{transform:rotate(360deg)}}
+  @keyframes pulse{50%{opacity:.5}}
+
+  h1{
+    font-family:'Orbitron',sans-serif;font-weight:900;font-size:clamp(2rem,9vw,2.9rem);
+    letter-spacing:.06em;position:relative;
+    background:linear-gradient(90deg,#fff 0%,var(--pink) 45%,var(--p1) 100%);
+    -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+    filter:drop-shadow(0 0 16px rgba(168,85,247,.55));
+  }
+  .underline{
+    width:140px;height:3px;margin-top:10px;border-radius:3px;
+    background:linear-gradient(90deg,transparent,var(--p1),var(--cyan),var(--p1),transparent);
+    box-shadow:0 0 12px var(--p1);
+  }
+
+  .links{width:100%;margin-top:34px;display:flex;flex-direction:column;gap:14px}
+  .link{
+    --c:var(--p1);
+    position:relative;display:flex;align-items:center;gap:16px;
+    padding:12px 20px 12px 14px;border-radius:14px;text-decoration:none;color:var(--text);
+    background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.01)),var(--panel);
+    border:1px solid var(--line);
+    clip-path:polygon(0 0,calc(100% - 16px) 0,100% 16px,100% 100%,16px 100%,0 calc(100% - 16px));
+    transition:transform .18s ease, border-color .18s ease, box-shadow .18s ease, background .18s;
+    opacity:0;transform:translateY(14px);
+    animation:rise .5s ease forwards;
+  }
+  .link::before{
+    content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--c);
+    box-shadow:0 0 12px var(--c);transform:scaleY(.35);transition:transform .2s;
+  }
+  .link:hover,.link:focus-visible{
+    transform:translateX(6px);border-color:var(--c);outline:none;
+    background:linear-gradient(90deg,color-mix(in srgb,var(--c) 16%,transparent),transparent 70%),var(--panel);
+    box-shadow:0 0 26px color-mix(in srgb,var(--c) 30%,transparent);
+  }
+  .link:hover::before,.link:focus-visible::before{transform:scaleY(1)}
+  .link .ico{
+    flex:0 0 auto;width:48px;height:48px;border-radius:12px;
+    display:flex;align-items:center;justify-content:center;font-size:1.5rem;
+    background:color-mix(in srgb,var(--c) 16%,#0d0820);
+    border:1px solid color-mix(in srgb,var(--c) 55%,transparent);
+    box-shadow:inset 0 0 14px color-mix(in srgb,var(--c) 22%,transparent),0 0 14px color-mix(in srgb,var(--c) 25%,transparent);
+    transition:transform .2s;
+  }
+  .link .ico svg{width:28px;height:28px;display:block;filter:drop-shadow(0 0 6px color-mix(in srgb,var(--c) 60%,transparent))}
+  .link:hover .ico{transform:scale(1.1) rotate(-6deg)}
+  .link .name{font-family:'Orbitron',sans-serif;font-weight:800;letter-spacing:.08em;font-size:1rem}
+  .link .arrow{margin-left:auto;color:var(--c);font-size:1.4rem;transition:transform .2s}
+  .link:hover .arrow{transform:translateX(4px)}
+  @keyframes rise{to{opacity:1;transform:none}}
+
+  footer{margin-top:44px;color:#6b5b94;font-size:.8rem;letter-spacing:.2em;text-transform:uppercase}
+
+  /* ---------- CHIBI ---------- */
+  #buddy{
+    position:fixed;right:14px;bottom:12px;z-index:50;min-width:64px;min-height:64px;
+    display:flex;align-items:flex-end;justify-content:center;
+    cursor:pointer;user-select:none;-webkit-user-select:none;touch-action:manipulation;
+    will-change:transform;
+  }
+  #buddy .sprite{
+    display:block;image-rendering:pixelated;
+    transform-origin:50% 100%;
+    filter:drop-shadow(0 5px 0 rgba(0,0,0,.45));
+    pointer-events:none;
+  }
+  #buddy .shadow{
+    position:absolute;left:14%;right:14%;bottom:-4px;height:8px;border-radius:50%;
+    background:radial-gradient(rgba(0,0,0,.6),transparent 70%);
+  }
+  .bubble{
+    position:absolute;right:62%;bottom:88%;white-space:nowrap;
+    background:#fff;color:#1a0b33;font-family:'Rajdhani',sans-serif;font-weight:700;font-size:.95rem;
+    padding:6px 12px;border-radius:12px;border:2px solid var(--p2);
+    transform:scale(0);transform-origin:100% 100%;transition:transform .25s cubic-bezier(.3,1.6,.5,1);
+    pointer-events:none;
+  }
+  .bubble::after{content:"";position:absolute;right:12px;bottom:-9px;border:6px solid transparent;border-top-color:var(--p2);border-bottom:0}
+  .bubble.show{transform:scale(1)}
+  .pow{
+    position:absolute;left:-38px;top:18px;font-family:'Orbitron',sans-serif;font-weight:900;
+    font-size:.9rem;color:#fff27a;text-shadow:2px 2px 0 var(--p2),0 0 10px var(--p1);
+    opacity:0;transform:scale(.3) rotate(-14deg);pointer-events:none;
+  }
+  .pow.hit{animation:pow .45s ease-out}
+  @keyframes pow{
+    0%{opacity:0;transform:scale(.3) rotate(-14deg)}
+    35%{opacity:1;transform:scale(1.25) rotate(-8deg)}
+    100%{opacity:0;transform:scale(1.5) rotate(-4deg) translateX(-10px)}
+  }
+  .heart{position:fixed;z-index:49;pointer-events:none;font-size:1.3rem;color:var(--pink);animation:floatUp 1.2s ease-out forwards}
+  @keyframes floatUp{
+    from{opacity:1;transform:translate(0,0) scale(.6)}
+    to{opacity:0;transform:translate(var(--dx),-90px) scale(1.2)}
+  }
+
+  .s-idle  .sprite{animation:breathe 1.8s ease-in-out infinite}
+  .s-hello .sprite{animation:wave .6s ease-in-out 3}
+  .s-walk  .sprite{animation:step .26s ease-in-out infinite}
+  .s-punch .sprite{animation:punch .55s ease-in-out}
+  .s-love  .sprite{animation:hop .45s ease-out 2}
+  @keyframes breathe{0%,100%{transform:scale(var(--fx,1),1)}50%{transform:scale(var(--fx,1),.95)}}
+  @keyframes wave{
+    0%,100%{transform:scale(var(--fx,1),1) rotate(0)}
+    25%{transform:scale(var(--fx,1),1) rotate(-10deg) translateY(-4px)}
+    75%{transform:scale(var(--fx,1),1) rotate(10deg) translateY(-4px)}
+  }
+  @keyframes step{
+    0%,100%{transform:scale(var(--fx,1),1) translateY(0) rotate(6deg)}
+    50%{transform:scale(var(--fx,1),1) translateY(-9px) rotate(-6deg)}
+  }
+  @keyframes punch{
+    0%{transform:scale(var(--fx,1),1) translateX(0) rotate(0)}
+    25%{transform:scale(var(--fx,1),1) translateX(8px) rotate(8deg)}
+    50%{transform:scale(var(--fx,1),1) translateX(-22px) rotate(-14deg) scale(1.08)}
+    100%{transform:scale(var(--fx,1),1) translateX(0) rotate(0)}
+  }
+  @keyframes hop{
+    0%,100%{transform:scale(var(--fx,1),1) translateY(0)}
+    50%{transform:scale(var(--fx,1),1) translateY(-22px)}
+  }
+
+  @media (max-width:420px){
+    main{padding-top:40px}
+    .avatar-wrap{width:150px;height:150px}
+  }
+  @media (prefers-reduced-motion:reduce){
+    .avatar-wrap::before,.avatar-wrap::after,.runner,.runner img,.grid{animation-duration:12s}
+  }
+</style>
+</head>
+<body>
+
+<!-- Tela de carregamento -->
+<div id="loader">
+  <div class="track">
+    <div class="runner"><img id="ninja" alt="" src=""></div>
+  </div>
+  <div class="loadtext">CARREGANDO<b id="pct"> 0%</b></div>
+  <div class="bar"><i id="barfill"></i></div>
+</div>
+
+<div class="speed"></div>
+<div class="grid"></div>
+<canvas id="sparks"></canvas>
+
+<main>
+  <div class="avatar-wrap">
+    <img class="avatar" src="avatar.png" alt="Foto de perfil do EsquiloDK">
+  </div>
+
+  <h1>EsquiloDK</h1>
+  <div class="underline"></div>
+
+  <nav class="links" id="links" aria-label="Links"></nav>
+
+  <footer>© EsquiloDK</footer>
+</main>
+
+<!-- Bonequinho interativo -->
+<div id="buddy" class="s-idle" role="img" aria-label="Chibi do EsquiloDK">
+  <div class="bubble" id="bubble">Olá!</div>
+  <span class="pow" id="pow">POW!</span>
+  <img class="sprite" id="sprite" alt="" src="">
+  <div class="shadow"></div>
+</div>
+
+<script>
+/* =====================================================
+   CONFIGURAÇÃO — edite só aqui
+   ===================================================== */
+
+// Os ícones das marcas já estão embutidos aqui (path = desenho do ícone, color = cor da marca).
+// Para trocar um link, mude só o "url". Para adicionar outro, copie um bloco inteiro.
+const LINKS = [
+  { name:"CurseForge", color:"F16436", url:"https://www.curseforge.com/members/esquilodk/projects",
+    path:"M18.326 9.2145S23.2261 8.4418 24 6.1882h-7.5066V4.4H0l2.0318 2.3576V9.173s5.1267-.2665 7.1098 1.2372c2.7146 2.516-3.053 5.917-3.053 5.917L5.0995 19.6c1.5465-1.4726 4.494-3.3775 9.8983-3.2857-2.0565.65-4.1245 1.6651-5.7344 3.2857h10.9248l-1.0288-3.2726s-7.918-4.6688-.8336-7.1127z" },
+  { name:"YouTube", color:"FF0000", url:"https://www.youtube.com/@esquiloscr",
+    path:"M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" },
+  { name:"Twitch", color:"9146FF", url:"https://www.twitch.tv/esquilodk",
+    path:"M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714Z" },
+  { name:"Discord", color:"5865F2", url:"https://discord.gg/HPTEgVSv7T",
+    path:"M20.317 4.3698a19.7913 19.7913 0 00-4.8851-1.5152.0741.0741 0 00-.0785.0371c-.211.3753-.4447.8648-.6083 1.2495-1.8447-.2762-3.68-.2762-5.4868 0-.1636-.3933-.4058-.8742-.6177-1.2495a.077.077 0 00-.0785-.037 19.7363 19.7363 0 00-4.8852 1.515.0699.0699 0 00-.0321.0277C.5334 9.0458-.319 13.5799.0992 18.0578a.0824.0824 0 00.0312.0561c2.0528 1.5076 4.0413 2.4228 5.9929 3.0294a.0777.0777 0 00.0842-.0276c.4616-.6304.8731-1.2952 1.226-1.9942a.076.076 0 00-.0416-.1057c-.6528-.2476-1.2743-.5495-1.8722-.8923a.077.077 0 01-.0076-.1277c.1258-.0943.2517-.1923.3718-.2914a.0743.0743 0 01.0776-.0105c3.9278 1.7933 8.18 1.7933 12.0614 0a.0739.0739 0 01.0785.0095c.1202.099.246.1981.3728.2924a.077.077 0 01-.0066.1276 12.2986 12.2986 0 01-1.873.8914.0766.0766 0 00-.0407.1067c.3604.698.7719 1.3628 1.225 1.9932a.076.076 0 00.0842.0286c1.961-.6067 3.9495-1.5219 6.0023-3.0294a.077.077 0 00.0313-.0552c.5004-5.177-.8382-9.6739-3.5485-13.6604a.061.061 0 00-.0312-.0286zM8.02 15.3312c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9555-2.4189 2.157-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.9555 2.4189-2.1569 2.4189zm7.9748 0c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9554-2.4189 2.1569-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.946 2.4189-2.1568 2.4189Z" },
+  { name:"Instagram", color:"FF0069", url:"https://www.instagram.com/esquiloscr",
+    path:"M7.0301.084c-1.2768.0602-2.1487.264-2.911.5634-.7888.3075-1.4575.72-2.1228 1.3877-.6652.6677-1.075 1.3368-1.3802 2.127-.2954.7638-.4956 1.6365-.552 2.914-.0564 1.2775-.0689 1.6882-.0626 4.947.0062 3.2586.0206 3.6671.0825 4.9473.061 1.2765.264 2.1482.5635 2.9107.308.7889.72 1.4573 1.388 2.1228.6679.6655 1.3365 1.0743 2.1285 1.38.7632.295 1.6361.4961 2.9134.552 1.2773.056 1.6884.069 4.9462.0627 3.2578-.0062 3.668-.0207 4.9478-.0814 1.28-.0607 2.147-.2652 2.9098-.5633.7889-.3086 1.4578-.72 2.1228-1.3881.665-.6682 1.0745-1.3378 1.3795-2.1284.2957-.7632.4966-1.636.552-2.9124.056-1.2809.0692-1.6898.063-4.948-.0063-3.2583-.021-3.6668-.0817-4.9465-.0607-1.2797-.264-2.1487-.5633-2.9117-.3084-.7889-.72-1.4568-1.3876-2.1228C21.2982 1.33 20.628.9208 19.8378.6165 19.074.321 18.2017.1197 16.9244.0645 15.6471.0093 15.236-.005 11.977.0014 8.718.0076 8.31.0215 7.0301.0839m.1402 21.6932c-1.17-.0509-1.8053-.2453-2.2287-.408-.5606-.216-.96-.4771-1.3819-.895-.422-.4178-.6811-.8186-.9-1.378-.1644-.4234-.3624-1.058-.4171-2.228-.0595-1.2645-.072-1.6442-.079-4.848-.007-3.2037.0053-3.583.0607-4.848.05-1.169.2456-1.805.408-2.2282.216-.5613.4762-.96.895-1.3816.4188-.4217.8184-.6814 1.3783-.9003.423-.1651 1.0575-.3614 2.227-.4171 1.2655-.06 1.6447-.072 4.848-.079 3.2033-.007 3.5835.005 4.8495.0608 1.169.0508 1.8053.2445 2.228.408.5608.216.96.4754 1.3816.895.4217.4194.6816.8176.9005 1.3787.1653.4217.3617 1.056.4169 2.2263.0602 1.2655.0739 1.645.0796 4.848.0058 3.203-.0055 3.5834-.061 4.848-.051 1.17-.245 1.8055-.408 2.2294-.216.5604-.4763.96-.8954 1.3814-.419.4215-.8181.6811-1.3783.9-.4224.1649-1.0577.3617-2.2262.4174-1.2656.0595-1.6448.072-4.8493.079-3.2045.007-3.5825-.006-4.848-.0608M16.953 5.5864A1.44 1.44 0 1 0 18.39 4.144a1.44 1.44 0 0 0-1.437 1.4424M5.8385 12.012c.0067 3.4032 2.7706 6.1557 6.173 6.1493 3.4026-.0065 6.157-2.7701 6.1506-6.1733-.0065-3.4032-2.771-6.1565-6.174-6.1498-3.403.0067-6.156 2.771-6.1496 6.1738M8 12.0077a4 4 0 1 1 4.008 3.9921A3.9996 3.9996 0 0 1 8 12.0077" },
+];
+
+// Qual imagem do chibi usar em cada situação (arquivos na mesma pasta do index.html)
+const SPRITES = {
+  idle:  "chibi-Esquilodk-standtall.gif",  // parado
+  hello: "chibi-Esquilodk-wave.gif",       // cumprimentando ao entrar
+  walk:  "chibi-Esquilodk-blockwalk.gif",  // andando ao rolar a página
+  punch: "chibi-Esquilodk-punch.gif",      // soquinho quando fica parado
+  love:  "chibi-Esquilodk-love.gif",       // coração ao clicar nele
+  sit:   "chibi-Esquilodk-sit.gif",        // senta se ficar muito tempo parado
+  ninja: "chibi-Esquilodk-ninjadash.gif",  // correndo na tela de carregamento
+};
+// Outros GIFs que você enviou e ainda não usei: sprint, bowshot, explosion, vanish, spotlight
+
+// Tamanho dos pixels do chibi (os GIFs são pequenos, então são ampliados em número inteiro)
+const PIXEL = () => (window.innerWidth < 420 ? 2 : 3);
+
+/* ===================================================== */
+
+// ---- links ----
+const nav = document.getElementById('links');
+LINKS.forEach((l,i)=>{
+  const a = document.createElement('a');
+  a.className = 'link';
+  a.href = l.url;
+  a.target = '_blank'; a.rel = 'noopener';
+  a.style.setProperty('--c', '#'+l.color);
+  a.style.animationDelay = (1.9 + i*0.09) + 's';
+  a.innerHTML = `<span class="ico"><svg viewBox="0 0 24 24" role="img" aria-label="${l.name}"><path fill="#${l.color}" d="${l.path}"/></svg></span><span class="name">${l.name}</span><span class="arrow">›</span>`;
+  nav.appendChild(a);
+});
+
+// ---- carregamento ----
+// ampliação em número inteiro mantém os pixels nítidos
+function scaleImg(img){
+  const k = PIXEL();
+  img.style.width  = img.naturalWidth  * k + 'px';
+  img.style.height = img.naturalHeight * k + 'px';
+}
+const ninjaImg = document.getElementById('ninja');
+ninjaImg.onload = () => scaleImg(ninjaImg);
+ninjaImg.src = SPRITES.ninja;
+const toLoad = [...new Set([...Object.values(SPRITES), 'avatar.png'])];
+const loader = document.getElementById('loader');
+const fill = document.getElementById('barfill');
+const pct = document.getElementById('pct');
+let progress = 0, loaded = 0, finished = false;
+const total = toLoad.length;
+toLoad.forEach(src=>{
+  const im = new Image();
+  im.onload = im.onerror = ()=>{ loaded++; };
+  im.src = src;
+});
+const startTime = performance.now();
+const MIN_TIME = 2200; // tempo mínimo da tela de carregamento (ms)
+const tick = setInterval(()=>{
+  const real = loaded/total;
+  const timeP = Math.min((performance.now()-startTime)/MIN_TIME,1);
+  const target = Math.min(real,timeP);
+  progress += (target-progress)*0.2;
+  const p = Math.round(progress*100);
+  fill.style.width = p+'%';
+  pct.textContent = ' '+p+'%';
+  if(real>=1 && timeP>=1 && progress>0.985 && !finished){
+    finished = true;
+    clearInterval(tick);
+    fill.style.width='100%'; pct.textContent=' 100%';
+    setTimeout(()=>{
+      loader.classList.add('done');
+      setTimeout(greet, 500);
+    },250);
+  }
+},40);
+
+// ---- chibi ----
+const buddy  = document.getElementById('buddy');
+const sprite = document.getElementById('sprite');
+const bubble = document.getElementById('bubble');
+const pow    = document.getElementById('pow');
+sprite.onload = () => scaleImg(sprite);
+sprite.src = SPRITES.idle;
+let idleCount = 0;
+
+let state = 'idle', facing = 1, offsetX = 0, scrollTimer, idleTimer, bubbleTimer, busy = false;
+const MAX_LEFT = () => -Math.min(window.innerWidth - 120, 240);
+
+function setState(s, src){
+  state = s;
+  buddy.className = 's-'+s;
+  sprite.src = src || SPRITES[s] || SPRITES.idle;
+  buddy.style.setProperty('--fx', facing);
+}
+function say(text, ms=2200){
+  bubble.textContent = text;
+  bubble.classList.add('show');
+  clearTimeout(bubbleTimer);
+  bubbleTimer = setTimeout(()=>bubble.classList.remove('show'), ms);
+}
+function toIdle(){
+  busy = false;
+  setState('idle');
+  scheduleIdleAction();
+}
+
+// Ao entrar: dá um olá
+function greet(){
+  busy = true;
+  setState('hello');
+  say('Olá! 👋', 2600);
+  setTimeout(toIdle, 2000);
+}
+
+// Parado por um tempo: dá um soquinho
+function scheduleIdleAction(){
+  clearTimeout(idleTimer);
+  idleTimer = setTimeout(()=>{
+    if(busy) return scheduleIdleAction();
+    busy = true;
+    // a cada 3 soquinhos, ele cansa e senta até você mexer na página de novo
+    if(++idleCount % 3 === 0){ setState('sit'); return; }
+    setState('punch');
+    setTimeout(()=>{ pow.classList.remove('hit'); void pow.offsetWidth; pow.classList.add('hit'); }, 250);
+    setTimeout(toIdle, 650);
+  }, 4500);
+}
+
+// Rolar a página: anda
+let lastY = window.scrollY;
+function onScroll(dir){
+  if(dir !== 0 && dir !== facing){ facing = dir; buddy.style.setProperty('--fx', facing); }
+  if(state !== 'walk'){
+    busy = true; clearTimeout(idleTimer);
+    bubble.classList.remove('show');
+    setState('walk');
+  }
+  offsetX += (dir === 1 ? -1 : 1) * 7;
+  offsetX = Math.max(MAX_LEFT(), Math.min(0, offsetX));
+  buddy.style.transform = `translateX(${offsetX}px)`;
+  clearTimeout(scrollTimer);
+  scrollTimer = setTimeout(()=>{ if(state==='walk') toIdle(); }, 220);
+}
+window.addEventListener('scroll', ()=>{
+  const y = window.scrollY; const d = y - lastY; lastY = y;
+  if(d !== 0) onScroll(d > 0 ? 1 : -1);
+}, {passive:true});
+// também reage quando a página é curta demais para rolar
+window.addEventListener('wheel', e=>{
+  if(document.documentElement.scrollHeight <= window.innerHeight + 4) onScroll(e.deltaY > 0 ? 1 : -1);
+}, {passive:true});
+let touchY = null;
+window.addEventListener('touchstart', e=>{ touchY = e.touches[0].clientY; }, {passive:true});
+window.addEventListener('touchmove', e=>{
+  if(touchY === null) return;
+  const y = e.touches[0].clientY, d = touchY - y;
+  if(Math.abs(d) > 6 && document.documentElement.scrollHeight <= window.innerHeight + 4){
+    onScroll(d > 0 ? 1 : -1); touchY = y;
+  }
+}, {passive:true});
+
+// Clique no chibi: coração
+buddy.addEventListener('click', ()=>{
+  busy = true; clearTimeout(idleTimer);
+  setState('love');
+  say('♥', 1500);
+  const r = buddy.getBoundingClientRect();
+  for(let i=0;i<7;i++){
+    const h = document.createElement('div');
+    h.className = 'heart'; h.textContent = '❤';
+    h.style.left = (r.left + r.width/2 + (Math.random()*50-25)) + 'px';
+    h.style.top  = (r.top + 8) + 'px';
+    h.style.setProperty('--dx', (Math.random()*60-30)+'px');
+    h.style.animationDelay = (i*0.08)+'s';
+    document.body.appendChild(h);
+    setTimeout(()=>h.remove(), 1500);
+  }
+  setTimeout(toIdle, 1100);
+});
+
+// ---- estrelinhas / brilhos anime no fundo ----
+(function(){
+  const c = document.getElementById('sparks'), ctx = c.getContext('2d');
+  const COLORS = ['#c084fc','#f0abfc','#67e8f9','#a78bfa','#ffffff'];
+  let W, H, ps = [];
+  function resize(){ W = c.width = innerWidth; H = c.height = innerHeight; }
+  resize(); addEventListener('resize', resize);
+  const N = Math.min(44, Math.floor(innerWidth/20));
+  for(let i=0;i<N;i++) ps.push({
+    x:Math.random()*W, y:Math.random()*H,
+    s:Math.random()*5+2, v:Math.random()*.45+.12, t:Math.random()*6.28,
+    col:COLORS[Math.random()*COLORS.length|0]
+  });
+  function star(x,y,r){ // estrela de 4 pontas
+    ctx.beginPath();
+    ctx.moveTo(x,y-r);
+    ctx.quadraticCurveTo(x,y,x+r,y);
+    ctx.quadraticCurveTo(x,y,x,y+r);
+    ctx.quadraticCurveTo(x,y,x-r,y);
+    ctx.quadraticCurveTo(x,y,x,y-r);
+    ctx.fill();
+  }
+  function frame(){
+    ctx.clearRect(0,0,W,H);
+    for(const p of ps){
+      p.y -= p.v; p.t += .035;
+      if(p.y < -10){ p.y = H+10; p.x = Math.random()*W; }
+      ctx.globalAlpha = .35 + .5*Math.abs(Math.sin(p.t));
+      ctx.fillStyle = p.col; ctx.shadowColor = p.col; ctx.shadowBlur = 10;
+      star(p.x,p.y,p.s*(.7+.3*Math.sin(p.t)));
+    }
+    ctx.globalAlpha = 1;
+    requestAnimationFrame(frame);
+  }
+  frame();
+})();
+</script>
+</body>
+</html>
