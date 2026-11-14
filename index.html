@@ -185,6 +185,18 @@
     box-shadow:inset 0 0 14px color-mix(in srgb,var(--c) 22%,transparent),0 0 14px color-mix(in srgb,var(--c) 25%,transparent);
     transition:transform .2s;
   }
+  .badge{
+    margin-left:-4px;padding:2px 9px;border-radius:999px;font-family:'Orbitron',sans-serif;font-weight:900;font-size:.62rem;
+    letter-spacing:.1em;color:#1a0b33;background:linear-gradient(90deg,#fde68a,#f59e0b);
+    box-shadow:0 0 12px rgba(245,158,11,.8);transform:rotate(-6deg);
+    animation:blinkNew 1s steps(1,end) infinite;
+  }
+  @keyframes blinkNew{
+    0%,100%{opacity:1;box-shadow:0 0 14px rgba(245,158,11,.9)}
+    50%{opacity:.15;box-shadow:none}
+  }
+  @media (prefers-reduced-motion:reduce){.badge{animation-duration:2.4s}}
+  .link .ico img{width:36px;height:36px;display:block;image-rendering:pixelated;border-radius:6px}
   .link .ico svg{width:28px;height:28px;display:block;filter:drop-shadow(0 0 6px color-mix(in srgb,var(--c) 60%,transparent))}
   .link:hover .ico{transform:scale(1.1) rotate(-6deg)}
   .link .name{font-family:'Orbitron',sans-serif;font-weight:800;letter-spacing:.08em;font-size:1rem}
@@ -316,6 +328,7 @@
 // Os ícones das marcas já estão embutidos aqui (path = desenho do ícone, color = cor da marca).
 // Para trocar um link, mude só o "url". Para adicionar outro, copie um bloco inteiro.
 const LINKS = [
+  { name:"Culinary Farmer's", color:"F59E0B", url:"https://4br.me/Culinaryfarmes", img:"culinary-farmers.png", badge:"New!" },
   { name:"CurseForge", color:"F16436", url:"https://www.curseforge.com/members/esquilodk/projects",
     path:"M18.326 9.2145S23.2261 8.4418 24 6.1882h-7.5066V4.4H0l2.0318 2.3576V9.173s5.1267-.2665 7.1098 1.2372c2.7146 2.516-3.053 5.917-3.053 5.917L5.0995 19.6c1.5465-1.4726 4.494-3.3775 9.8983-3.2857-2.0565.65-4.1245 1.6651-5.7344 3.2857h10.9248l-1.0288-3.2726s-7.918-4.6688-.8336-7.1127z" },
   { name:"YouTube", color:"FF0000", url:"https://www.youtube.com/@esquiloscr",
@@ -354,7 +367,7 @@ LINKS.forEach((l,i)=>{
   a.target = '_blank'; a.rel = 'noopener';
   a.style.setProperty('--c', '#'+l.color);
   a.style.animationDelay = (1.9 + i*0.09) + 's';
-  a.innerHTML = `<span class="ico"><svg viewBox="0 0 24 24" role="img" aria-label="${l.name}"><path fill="#${l.color}" d="${l.path}"/></svg></span><span class="name">${l.name}</span><span class="arrow">›</span>`;
+  a.innerHTML = `<span class="ico">${l.img ? `<img src="${l.img}" alt="${l.name}">` : `<svg viewBox="0 0 24 24" role="img" aria-label="${l.name}"><path fill="#${l.color}" d="${l.path}"/></svg>`}</span><span class="name">${l.name}</span>${l.badge ? `<span class="badge">${l.badge}</span>` : ''}<span class="arrow">›</span>`;
   nav.appendChild(a);
 });
 
@@ -368,7 +381,7 @@ function scaleImg(img){
 const ninjaImg = document.getElementById('ninja');
 ninjaImg.onload = () => scaleImg(ninjaImg);
 ninjaImg.src = SPRITES.ninja;
-const toLoad = [...new Set([...Object.values(SPRITES), 'avatar.png'])];
+const toLoad = [...new Set([...Object.values(SPRITES), 'avatar.png', 'culinary-farmers.png'])];
 const loader = document.getElementById('loader');
 const fill = document.getElementById('barfill');
 const pct = document.getElementById('pct');
